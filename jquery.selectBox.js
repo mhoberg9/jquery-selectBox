@@ -167,10 +167,9 @@
             options.appendTo('BODY');
 
             input
-            .bind('input.selectBox', function (event) {
-                self.handleInput(event);
-            });
-
+                .bind('input.selectBox', function (event) {
+                    self.handleInput(event);
+                });
             control
                 .data('selectBox-options', options)
                 .addClass('selectBox-dropdown')
@@ -210,10 +209,10 @@
 
             // Set label width
             var labelWidth =
-                    control.width()
-                  - arrow.outerWidth()
-                  - (parseInt(label.css('paddingLeft')) || 0)
-                  - (parseInt(label.css('paddingRight')) || 0);
+                control.width()
+                - arrow.outerWidth()
+                - (parseInt(label.css('paddingLeft')) || 0)
+                - (parseInt(label.css('paddingRight')) || 0);
 
             label.width(labelWidth);
             this.disableSelection(control);
@@ -457,8 +456,8 @@
             , settings = select.data('selectBox-settings')
             , options  = control.data('selectBox-options')
             , options = control.data('selectBox-options')
-		    , label = control.find('.selectBox-label')
-			, input = control.find('.selectBox-input');
+            , label = control.find('.selectBox-label')
+            , input = control.find('.selectBox-input');
 
         if (control.hasClass('selectBox-disabled')) {
             return false;
@@ -483,8 +482,8 @@
             , posTop = (heightToTop > heightToBottom) && (settings.keepInViewport == null ? true : settings.keepInViewport)
             , width = control.innerWidth() >= options.innerWidth() ? control.innerWidth() + 'px' : 'auto'
             , top = posTop
-                  ? pos.top - optionsHeight + borderTopWidth + topPositionCorrelation
-                  : pos.top + controlHeight - borderBottomWidth - bottomPositionCorrelation;
+            ? pos.top - optionsHeight + borderTopWidth + topPositionCorrelation
+            : pos.top + controlHeight - borderBottomWidth - bottomPositionCorrelation;
 
 
         // If the height to top and height to bottom are less than the max-height
@@ -516,10 +515,10 @@
             // Add Top and Bottom class based on position
             .addClass('selectBox-options selectBox-options-'+(posTop?'top':'bottom'));
 
-		if (settings.styleClass) {
-			options.addClass(settings.styleClass);
-		}
-		
+        if (settings.styleClass) {
+            options.addClass(settings.styleClass);
+        }
+
         if (select.triggerHandler('beforeopen')) {
             return false;
         }
@@ -555,21 +554,21 @@
 
         $(document).bind('mousedown.selectBox', function (event) {
             if (1 === event.which) {
-                if ($(event.target).parents().andSelf().hasClass('selectBox-options')) {
+                if ($(event.target).parents().addBack().hasClass('selectBox-options')) {
                     return;
                 }
                 self.hideMenus();
             }
         });
         // If there's scroll in the container
-		if (options[0].scrollHeight > options.height()) {
-			label.hide();
-			input.val('');
-			input.show();
-			setTimeout(function () {
-				input.focus();
-			}, 200);
-		}
+        if (options[0].scrollHeight > options.height()) {
+            label.hide();
+            input.val('');
+            input.show();
+            setTimeout(function () {
+                input.focus();
+            }, 200);
+        }
     };
 
     /**
@@ -589,7 +588,7 @@
                 , posTop = options.data('posTop')
                 , label = control.find('.selectBox-label')
                 , input = control.find('.selectBox-input');
-            
+
             label.show();
             input.hide();
             options.find('A').each(function () {
@@ -790,63 +789,72 @@
      * Handles the input event, for search in dropdowns with scroll enabled
      *
      */
-	SelectBox.prototype.handleInput = function () {
-		var select = $(this.selectElement)
+    SelectBox.prototype.handleInput = function () {
+        var select = $(this.selectElement)
             , control = select.data('selectBox-control')
             , options = control.data('selectBox-options')
             , self = this;
 
-		if (control.hasClass('selectBox-disabled')) {
-			return;
-		}
+        if (control.hasClass('selectBox-disabled')) {
+            return;
+        }
 
-		
-		// Type to find
-		if (!control.hasClass('selectBox-menuShowing')) {
-			this.showMenu();
-		}
-		this.typeSearch = control.find('.selectBox-input').val();
-		options.find('A').each(function () {
-			if ($(this).text().substr(0, self.typeSearch.length).toLowerCase() === self.typeSearch.toLowerCase()) {
-				$(this).show();
-			} else {
-				$(this).toggle(self.typeSearch.length === 0);
-			}
-		});
-		//if listing is displayed on top
-		if (options.hasClass('selectBox-options-top')) {
-			self.resizeOptionList();
-		}
+        function filterDropdown(haystack, needle) {
+            return haystack.toLowerCase().includes(needle.toLowerCase());
+        }
 
-	};
-	/**
+        // Type to find
+        if (!control.hasClass('selectBox-menuShowing')) {
+            this.showMenu();
+        }
+        event.preventDefault();
+        clearTimeout(this.typeTimer);
+        this.typeSearch = control.find('.selectBox-input').val();
+        options.find('A').each(function () {
+            //label.append(input)
+            if (filterDropdown($(this).text().trim(), self.typeSearch)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        //if listing is displayed on top
+        if (options.hasClass('selectBox-options-top')) {
+            self.resizeOptionList();
+        }
+
+        // Set the input value as the text of the selectBox-label
+        control.find('.selectBox-label').text(this.typeSearch);
+
+    };
+    /**
      * Resizes list for search when dropdown list displays on top
      */
-	SelectBox.prototype.resizeOptionList = function resizeList() {
-		var self = this
+    SelectBox.prototype.resizeOptionList = function resizeList() {
+        var self = this
             , select = $(this.selectElement)
             , control = select.data('selectBox-control')
             , settings = select.data('selectBox-settings')
-			, options = control.data('selectBox-options')
-		    , label = control.find('.selectBox-label')
-			, input = control.find('.selectBox-input');
-		
-			// Get top and bottom width of selectBox
-			var borderBottomWidth = parseInt(control.css('borderBottomWidth')) || 0;
-			var borderTopWidth = parseInt(control.css('borderTopWidth')) || 0;
+            , options = control.data('selectBox-options')
+            , label = control.find('.selectBox-label')
+            , input = control.find('.selectBox-input');
 
-			// Get proper variables for keeping options in viewport
-			var pos = control.offset()
-				, topPositionCorrelation = (settings.topPositionCorrelation) ? settings.topPositionCorrelation : 0
-				, optionsHeight = options.outerHeight()
-				, top = pos.top - optionsHeight + borderTopWidth + topPositionCorrelation;
+        // Get top and bottom width of selectBox
+        var borderBottomWidth = parseInt(control.css('borderBottomWidth')) || 0;
+        var borderTopWidth = parseInt(control.css('borderTopWidth')) || 0;
 
-			// Menu position
-			options
-				.css({
-					top: top
-				})
-	};
+        // Get proper variables for keeping options in viewport
+        var pos = control.offset()
+            , topPositionCorrelation = (settings.topPositionCorrelation) ? settings.topPositionCorrelation : 0
+            , optionsHeight = options.outerHeight()
+            , top = pos.top - optionsHeight + borderTopWidth + topPositionCorrelation;
+
+        // Menu position
+        options
+            .css({
+                top: top
+            })
+    };
 
     /**
      * Handles the keyDown event.
@@ -876,18 +884,18 @@
                 this.hideMenus();
                 this.removeHover();
                 break;
-            case 13:
-                // enter
-                if (control.hasClass('selectBox-menuShowing')) {
-                    this.selectOption(options.find('LI.selectBox-hover:first'), event);
-                    if (control.hasClass('selectBox-dropdown')) {
-                        this.hideMenus();
-                    }
-                } else {
-                    this.showMenu();
-                }
-                break;
-            case 38:
+            // case 13:
+            //     // enter
+            //     if (control.hasClass('selectBox-menuShowing')) {
+            //         this.selectOption(options.find('LI.selectBox-hover:first'), event);
+            //         if (control.hasClass('selectBox-dropdown')) {
+            //             this.hideMenus();
+            //         }
+            //     } else {
+            //         this.showMenu();
+            //     }
+            //     break;
+            //case 38:
             // up
             case 37:
                 // left
@@ -897,7 +905,7 @@
                     totalOptions = options.find('LI:not(.selectBox-optgroup)').length;
                     i = 0;
                     while (prev.length === 0 || prev.hasClass('selectBox-disabled') ||
-                        prev.hasClass('selectBox-optgroup')) {
+                    prev.hasClass('selectBox-optgroup')) {
                         prev = prev.prev('LI');
                         if (prev.length === 0) {
                             if (settings.loopOptions) {
@@ -917,7 +925,7 @@
                     this.showMenu();
                 }
                 break;
-            case 40:
+            //case 40:
             // down
             case 39:
                 // right
@@ -927,7 +935,7 @@
                     totalOptions = options.find('LI:not(.selectBox-optgroup)').length;
                     i = 0;
                     while (0 === next.length || next.hasClass('selectBox-disabled') ||
-                        next.hasClass('selectBox-optgroup')) {
+                    next.hasClass('selectBox-optgroup')) {
                         next = next.next('LI');
                         if (next.length === 0) {
                             if (settings.loopOptions) {
@@ -1123,51 +1131,51 @@
      */
     $.extend($.fn, {
 
-          /**
-     * Sets the option elements.
-     *
-     * @param {String|Object} options
-     */
-    setOptions : function (options) {
-        var select = $(this)
-            , control = select.data('selectBox-control');
-         
-      
-        switch (typeof(options)) {
-            case 'string':
-                select.html(options);
-                break;
-            case 'object':
-                select.html('');
-                for (var i in options) {
-                    if (options[i] === null) {
-                        continue;
-                    }
-                    if (typeof(options[i]) === 'object') {
-                        var optgroup = $('<optgroup label="' + i + '" />');
-                        for (var j in options[i]) {
-                            optgroup.append('<option value="' + j + '">' + options[i][j] + '</option>');
-                        }
-                        select.append(optgroup);
-                    } else {
-                        var option = $('<option value="' + i + '">' + options[i] + '</option>');
-                        select.append(option);
-                    }
-                }
-                break;
-        }
+        /**
+         * Sets the option elements.
+         *
+         * @param {String|Object} options
+         */
+        setOptions : function (options) {
+            var select = $(this)
+                , control = select.data('selectBox-control');
 
-        if (control) {
-            // Refresh the control
-            $(this).selectBox('refresh');
-            // Remove old options
-  
-        }
-      },
-      
-      
-      
-      selectBox: function (method, options) {
+
+            switch (typeof(options)) {
+                case 'string':
+                    select.html(options);
+                    break;
+                case 'object':
+                    select.html('');
+                    for (var i in options) {
+                        if (options[i] === null) {
+                            continue;
+                        }
+                        if (typeof(options[i]) === 'object') {
+                            var optgroup = $('<optgroup label="' + i + '" />');
+                            for (var j in options[i]) {
+                                optgroup.append('<option value="' + j + '">' + options[i][j] + '</option>');
+                            }
+                            select.append(optgroup);
+                        } else {
+                            var option = $('<option value="' + i + '">' + options[i] + '</option>');
+                            select.append(option);
+                        }
+                    }
+                    break;
+            }
+
+            if (control) {
+                // Refresh the control
+                $(this).selectBox('refresh');
+                // Remove old options
+
+            }
+        },
+
+
+
+        selectBox: function (method, options) {
             var selectBox;
 
             switch (method) {
@@ -1183,11 +1191,11 @@
                     break;
                 case 'options':
                     // Getter
-                   
+
                     if (undefined === options) {
                         return $(this).data('selectBox-control').data('selectBox-options');
                     }
-                   
+
                     // Setter
                     $(this).each(function () {
                         $(this).setOptions(options);
