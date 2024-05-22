@@ -1,3 +1,10 @@
+Forked from https://github.com/cbernat/jquery-selectBox.
+Changes:
+- Replaced equals with include for filtering the dropdown menu
+- Typed filter value is now shown inside the dropdown menu
+- Input values for the filter are now hidden and non-selectable
+
+
 # jQuery selectBox: A styleable replacement for SELECT elements
 
 _Licensed under the MIT license: http://opensource.org/licenses/MIT_
